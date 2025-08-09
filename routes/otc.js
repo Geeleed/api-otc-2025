@@ -63,10 +63,10 @@ router.route("/check").post(async (req, res) => {
     if (otcData) {
       delete otcIndex[otc];
     }
-    res.json({ organization: otcData?.organization });
+    res.json({ organization: otcData?.organization, status: "success" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error, organization: null });
+    res.status(500).json({ error, organization: null, status: "fail" });
   }
 });
 
