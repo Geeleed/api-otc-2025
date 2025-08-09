@@ -1,5 +1,8 @@
 const express = require("express");
-const { generateSecureOTP } = require("../pure_function/utils");
+const {
+  generateSecureOTP,
+  generateSecureOTPV2,
+} = require("../pure_function/utils");
 const bcrypt = require("bcrypt");
 const { getUsers } = require("../constants/users");
 const pool = require("../configs/db");
@@ -25,11 +28,11 @@ router.route("/").post(async (req, res) => {
   const auth = bcrypt.compareSync(password, hashPassword);
   try {
     if (auth === false) throw { message: "ข้อมูลไม่ถูกต้อง" };
-    const otc = generateSecureOTP();
+    const otc = generateSecureOTPV2();
     let hasOtc = otcIndex?.[otc];
     let newOtc = otc;
     while (hasOtc) {
-      const otc = generateSecureOTP();
+      const otc = generateSecureOTPV2();
       hasOtc = otcIndex?.[otc];
       newOtc = otc;
     }
