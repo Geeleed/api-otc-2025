@@ -17,7 +17,7 @@ router.route("/hash/:password").get(async (req, res) => {
 
 router.route("/database").get(async (req, res) => {
   try {
-    const users = getUsers();
+    const users = await getUsers();
     const database = users.map((el) => el.organization);
     res.json(database);
   } catch (err) {

@@ -16,7 +16,7 @@ router.route("/changePassword").post(async (req, res) => {
       throw { message: "ไม่พบบัญชี", staus: "fail" };
     }
 
-    const users = getUsers();
+    const users = await getUsers();
     const hasUser = users.find((el) => el.email === email)?.email;
     if (Boolean(hasUser) === false) {
       throw { message: "ไม่พบบัญชี", staus: "fail" };
@@ -61,18 +61,13 @@ router.route("/verifyChangePassword").get(async (req, res) => {
     console.log("✅ มีการยืนยันเปลี่ยนรหัสผ่าน", decoded);
     const email = decoded?.email;
     const password = decoded?.password;
-    const users = getUsers();
-    const tempUsers = users.map((el) => {
-      if (el.email === email) {
-        return { ...el, password };
-      } else {
-        return el;
-      }
-    });
-    setUsers([...tempUsers]);
+    const users = await getUsers();
+    let data = users.find((el) => el.email === email);
+    data = { ...data, password };
+    await setUsers(data);
     res.send({ message: "เปลี่ยนรหัสผ่านสำเร็จ", status: "success" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.send({
       message: "เปลี่ยนรหัสไม่สำเร็จ กรุณาส่งคำขอเปลี่ยนรหัสใหม่",
       status: "fail",

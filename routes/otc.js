@@ -18,7 +18,7 @@ router.route("/").get(async (req, res) => {
 
 router.route("/").post(async (req, res) => {
   const { email, password } = req.body;
-  const users = getUsers();
+  const users = await getUsers();
   const result = users.find((el) => el.email === email);
   const hashPassword = result?.password || "";
   const auth = bcrypt.compareSync(password, hashPassword);
