@@ -2,6 +2,7 @@ const express = require("express");
 const { generateSecureOTP } = require("../pure_function/utils");
 const bcrypt = require("bcrypt");
 const { getUsers } = require("../constants/users");
+const pool = require("../configs/db");
 const router = express.Router();
 
 router.use(express.json());
@@ -36,10 +37,14 @@ router.route("/").post(async (req, res) => {
       expire: new Date().getTime() + 3 * 60 * 1000,
       organization: result.organization,
     };
-    res.json({ otc: newOtc, organization: result.organization });
+    res.json({
+      otc: newOtc,
+      organization: result.organization,
+      status: "success",
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ err: "OTC failed", ...error });
+    res.status(500).json({ err: "OTC failed", ...error, status: "fail" });
   }
 });
 
@@ -78,6 +83,26 @@ router.route("/check/:otc").get(async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json(error);
+  }
+});
+
+router.route("/requestRegister").post(async (req, res) => {
+  const { name, email, tel, description } = req.body;
+  const conn = await pool.connect();
+  try {
+    await conn.query("BEGIN");
+    await conn.query(
+      `INSERT INTO otc_tempolary (tempolary, marker_1) VALUES ($1, $2)`,
+      [JSON.stringify({ name, email, tel, description }), "requestRegister"]
+    );
+    await conn.query("COMMIT");
+    res.json({ status: "success" });
+  } catch (error) {
+    console.error(error);
+    await conn.query("ROLLBACK");
+    res.json({ status: "fail" });
+  } finally {
+    conn.release();
   }
 });
 
