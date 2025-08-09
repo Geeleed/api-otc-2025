@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.use(express.json());
 
-let otcIndex = {};
+let otcIndex = {}; // {expire:1777777,organization:Ball}
 
 router.route("/").get(async (req, res) => {
   try {
@@ -55,7 +55,7 @@ router.route("/check").post(async (req, res) => {
   const otc = req.body.otc;
   try {
     let otcData = otcIndex?.[otc];
-    const isExpire = new Date().getTime() > otcData.expire;
+    const isExpire = new Date().getTime() > otcData?.expire;
     if (isExpire) {
       delete otcIndex[otc];
       otcData = undefined;
@@ -63,7 +63,7 @@ router.route("/check").post(async (req, res) => {
     if (otcData) {
       delete otcIndex[otc];
     }
-    res.json({ organization: otcData.organization });
+    res.json({ organization: otcData?.organization });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error, organization: null });
@@ -74,7 +74,7 @@ router.route("/check/:otc").get(async (req, res) => {
   const otc = req.params.otc;
   try {
     let otcData = otcIndex?.[otc];
-    const isExpire = new Date().getTime() > otcData.expire;
+    const isExpire = new Date().getTime() > otcData?.expire;
     if (isExpire) {
       delete otcIndex[otc];
       otcData = undefined;
